@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import type { SiloLevelSample, AlarmEvent, SiloData, SiloStatus, ProductionData, ConnectionStatus } from '../types';
 
 const MAX_HISTORY_POINTS = 50;
-const SILO_CAPACITY_KG = 5000;
+const SILO_CAPACITY_KG = 140;
 
 export function useSiloData() {
-  const [currentLevel, setCurrentLevel] = useState(85);
+  const [currentLevel, setCurrentLevel] = useState(100);
   const [history, setHistory] = useState<SiloLevelSample[]>([]);
   const [events, setEvents] = useState<AlarmEvent[]>([]);
   const [lastRefillTime, setLastRefillTime] = useState(new Date(Date.now() - 2 * 60 * 60 * 1000));
@@ -38,15 +38,16 @@ export function useSiloData() {
       setCurrentLevel(prev => {
         let newLevel = prev;
         
-        // Simulate consumption (decrease slowly with noise)
-        if (prev > 10) {
-          const decrease = 0.3 + Math.random() * 0.2; // 0.3-0.5% per second
-          newLevel = Math.max(0, prev - decrease);
+        // Drain from 100% to 60% over 2 minutes (120 seconds)
+        // Decrease rate: 40% / 120 seconds = 0.333% per second
+        if (prev > 60) {
+          const decrease = 0.333; // Fixed rate to reach 60% in 2 minutes
+          newLevel = Math.max(60, prev - decrease);
         }
 
-        // Simulate refill when critically low
-        if (prev < 10 && Math.random() > 0.7) {
-          newLevel = 90 + Math.random() * 10; // Refill to 90-100%
+        // Refill to 100% when reaching 60%
+        if (prev <= 60 && newLevel <= 60) {
+          newLevel = 100;
           setLastRefillTime(new Date());
           addEvent('info', `Silo ${newLevel.toFixed(1)}% seviyesine dolduruldu`);
         }

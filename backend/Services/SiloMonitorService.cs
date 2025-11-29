@@ -62,7 +62,7 @@ public class SiloMonitorService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("SiloMonitorService starting");
+        _logger.LogInformation("SiloMonitorService starting - waiting for manual PLC connection");
 
         // Wait a bit for the application to fully start
         await Task.Delay(2000, stoppingToken);
@@ -71,6 +71,7 @@ public class SiloMonitorService : BackgroundService
         {
             try
             {
+                // Skip if not connected (will return 0)
                 var level = await _dataSource.GetCurrentLevelAsync(stoppingToken);
 
                 lock (_lock)
@@ -116,6 +117,7 @@ public class SiloMonitorService : BackgroundService
             // Temperature monitoring
             try
             {
+                // Skip if not connected (will return 0)
                 var temp = await _dataSource.GetCurrentTemperatureAsync(stoppingToken);
 
                 lock (_temperatureLock)

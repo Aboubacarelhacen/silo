@@ -6,6 +6,7 @@ import { SiloTrendChart } from "../components/silo/SiloTrendChart";
 import { EventLog } from "../components/silo/EventLog";
 import { ProductionStatusCard } from "../components/dashboard/ProductionStatusCard";
 import { AnimatedThermometer } from "../components/ui/animated-thermometer";
+import { PlcConnectionControl } from "../components/plc/PlcConnectionControl";
 import {
   Card,
   CardContent,
@@ -59,6 +60,9 @@ export function DashboardPage({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* PLC Connection Control */}
+      <PlcConnectionControl />
+
       {/* Alarm Banner */}
       <AlarmBanner
         status={siloData.status}

@@ -13,6 +13,8 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
     private Opc.Ua.Client.ISession? _session;
     private readonly SemaphoreSlim _sessionLock = new(1, 1);
     private ApplicationConfiguration? _appConfig;
+    private bool _manuallyDisconnected = false;
+    private string? _lastError = null;
 
     public RealOpcUaSiloDataSource(
         IConfiguration configuration,
@@ -25,16 +27,25 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
             ?? throw new InvalidOperationException("OpcUa:SiloLevelNodeId not configured");
         _temperatureNodeId = configuration["OpcUa:TemperatureNodeId"]
             ?? throw new InvalidOperationException("OpcUa:TemperatureNodeId not configured");
-    }
 
+        // Start in connected state - auto-connect on startup
+        _manuallyDisconnected = false;
+        _logger.LogInformation("OPC UA client initialized - will auto-connect");
+    }
     public async Task<double> GetCurrentLevelAsync(CancellationToken ct = default)
     {
+        if (_manuallyDisconnected)
+        {
+            // Silently return 0 when not connected (not an error)
+            return 0.0;
+        }
+
         await EnsureSessionAsync(ct);
 
         if (_session == null || !_session.Connected)
         {
-            _logger.LogError("Session is not connected after ensure");
-            throw new InvalidOperationException("OPC UA session not connected");
+            _logger.LogWarning("Session is not connected after ensure");
+            return 0.0;
         }
 
         try
@@ -98,12 +109,18 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
 
     public async Task<double> GetCurrentTemperatureAsync(CancellationToken ct = default)
     {
+        if (_manuallyDisconnected)
+        {
+            // Silently return 0 when not connected (not an error)
+            return 0.0;
+        }
+
         await EnsureSessionAsync(ct);
 
         if (_session == null || !_session.Connected)
         {
-            _logger.LogError("Session is not connected");
-            throw new InvalidOperationException("OPC UA session not connected");
+            _logger.LogWarning("Session is not connected");
+            return 0.0;
         }
 
         try
@@ -165,8 +182,70 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
         }
     }
 
+    public async Task ConnectAsync(CancellationToken ct = default)
+    {
+        await _sessionLock.WaitAsync(ct);
+        try
+        {
+            _manuallyDisconnected = false;
+            _lastError = null;
+            await CreateSessionAsync(ct);
+        }
+        finally
+        {
+            _sessionLock.Release();
+        }
+    }
+
+    public void Disconnect()
+    {
+        _sessionLock.Wait();
+        try
+        {
+            _manuallyDisconnected = true;
+            if (_session != null)
+            {
+                try
+                {
+                    _session.Close();
+                    _session.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error closing session during manual disconnect");
+                }
+                _session = null;
+            }
+            _logger.LogInformation("Manually disconnected from PLC");
+        }
+        finally
+        {
+            _sessionLock.Release();
+        }
+    }
+
+    public ConnectionStatus GetConnectionStatus()
+    {
+        var isConnected = _session != null && _session.Connected && !_manuallyDisconnected;
+        var message = _manuallyDisconnected
+            ? "Bağlantı kesildi"
+            : isConnected
+                ? "Bağlı"
+                : "Bağlı değil";
+
+        return new ConnectionStatus(
+            isConnected,
+            message,
+            _lastError,
+            _endpointUrl
+        );
+    }
+
     private async Task EnsureSessionAsync(CancellationToken ct)
     {
+        if (_manuallyDisconnected)
+            return;
+
         if (_session != null && _session.Connected)
             return;
 
@@ -177,6 +256,24 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
             if (_session != null && _session.Connected)
                 return;
 
+            await CreateSessionAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _lastError = ex.Message;
+            _logger.LogError(ex, "Failed to ensure OPC UA session");
+            throw;
+        }
+        finally
+        {
+            _sessionLock.Release();
+        }
+    }
+
+    private async Task CreateSessionAsync(CancellationToken ct)
+    {
+        try
+        {
             _logger.LogInformation("Creating OPC UA session to {EndpointUrl}", _endpointUrl);
 
             // Close old session if exists
@@ -240,16 +337,14 @@ public class RealOpcUaSiloDataSource : ISiloDataSource, IDisposable
                 identity: new UserIdentity(new AnonymousIdentityToken()),
                 preferredLocales: null);
 
+            _lastError = null;
             _logger.LogInformation("OPC UA session created successfully");
         }
         catch (Exception ex)
         {
+            _lastError = ex.Message;
             _logger.LogError(ex, "Failed to create OPC UA session");
             throw;
-        }
-        finally
-        {
-            _sessionLock.Release();
         }
     }
 
