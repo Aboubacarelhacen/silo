@@ -26,7 +26,7 @@ export function SettingsPage({ onSave }: SettingsPageProps) {
     updateInterval: 1,
     historyRetention: 50,
     autoRefillLevel: 10,
-    siloCapacity: 140,
+    siloCapacity: 450,
 
     // Sistem Ayarları
     language: "tr",
@@ -58,7 +58,7 @@ export function SettingsPage({ onSave }: SettingsPageProps) {
         updateInterval: 1,
         historyRetention: 50,
         autoRefillLevel: 10,
-        siloCapacity: 140,
+        siloCapacity: 450,
         language: "tr",
         timezone: "Europe/Istanbul",
         dateFormat: "DD/MM/YYYY",

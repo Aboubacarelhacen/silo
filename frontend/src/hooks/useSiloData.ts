@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { SiloLevelSample, AlarmEvent, SiloData, SiloStatus, ProductionData, ConnectionStatus } from '../types';
 
 const MAX_HISTORY_POINTS = 50;
-const SILO_CAPACITY_KG = 140;
+const SILO_CAPACITY_KG = 450;
 
 export function useSiloData() {
   const [currentLevel, setCurrentLevel] = useState(100);

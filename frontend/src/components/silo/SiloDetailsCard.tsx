@@ -1,35 +1,43 @@
-import { Activity, Clock, Database, AlertTriangle, TrendingDown, CheckCircle } from 'lucide-react';
-import type { SiloData } from '../../types';
+import {
+  Activity,
+  Clock,
+  Database,
+  AlertTriangle,
+  TrendingDown,
+  CheckCircle,
+} from "lucide-react";
+import type { SiloData } from "../../types";
 
 interface SiloDetailsCardProps {
   siloData: SiloData;
 }
 
 export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
-  const { currentLevel, status, volumeKg, lastRefillTime, lastUpdateTime } = siloData;
+  const { currentLevel, status, volumeKg, lastRefillTime, lastUpdateTime } =
+    siloData;
 
   const getStatusConfig = () => {
     switch (status) {
-      case 'critical':
+      case "critical":
         return {
           icon: AlertTriangle,
-          text: 'KRİTİK – Hemen Doldurun',
-          color: 'text-red-600 dark:text-red-400',
-          bgColor: 'bg-red-500/10',
+          text: "KRİTİK – Hemen Doldurun",
+          color: "text-red-600 dark:text-red-400",
+          bgColor: "bg-red-500/10",
         };
-      case 'low':
+      case "low":
         return {
           icon: TrendingDown,
-          text: 'Düşük – Yakında Doldurun',
-          color: 'text-yellow-600 dark:text-yellow-400',
-          bgColor: 'bg-yellow-500/10',
+          text: "Düşük – Yakında Doldurun",
+          color: "text-yellow-600 dark:text-yellow-400",
+          bgColor: "bg-yellow-500/10",
         };
-      case 'normal':
+      case "normal":
         return {
           icon: CheckCircle,
-          text: 'Normal',
-          color: 'text-teal-600 dark:text-teal-400',
-          bgColor: 'bg-teal-500/10',
+          text: "Normal",
+          color: "text-teal-600 dark:text-teal-400",
+          bgColor: "bg-teal-500/10",
         };
     }
   };
@@ -52,10 +60,14 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
 
       <div className="space-y-4">
         {/* Status Badge */}
-        <div className={`flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 ${statusConfig.bgColor} p-4`}>
+        <div
+          className={`flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 ${statusConfig.bgColor} p-4`}
+        >
           <StatusIcon className={`h-6 w-6 ${statusConfig.color}`} />
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Durum</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Durum
+            </div>
             <div className={`${statusConfig.color}`}>{statusConfig.text}</div>
           </div>
         </div>
@@ -67,8 +79,12 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
               <Activity className="h-4 w-4" />
               <span className="text-sm">Mevcut Seviye</span>
             </div>
-            <div className="mt-2 text-2xl text-gray-900 dark:text-white tabular-nums">{currentLevel.toFixed(1)}%</div>
-            <div className="text-sm text-gray-500">{volumeKg.toFixed(0)} kg</div>
+            <div className="mt-2 text-2xl text-gray-900 dark:text-white tabular-nums">
+              {currentLevel.toFixed(1)}%
+            </div>
+            <div className="text-sm text-gray-500">
+              {volumeKg.toFixed(0)} kg
+            </div>
           </div>
 
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
@@ -76,7 +92,9 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
               <Database className="h-4 w-4" />
               <span className="text-sm">Kapasite</span>
             </div>
-            <div className="mt-2 text-2xl text-gray-900 dark:text-white">5.000</div>
+            <div className="mt-2 text-2xl text-gray-900 dark:text-white">
+              450
+            </div>
             <div className="text-sm text-gray-500">kg toplam</div>
           </div>
         </div>
@@ -89,12 +107,14 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
               <span className="text-sm">Son Dolum</span>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-900 dark:text-white">{formatTimeSince(lastRefillTime)}</div>
+              <div className="text-sm text-gray-900 dark:text-white">
+                {formatTimeSince(lastRefillTime)}
+              </div>
               <div className="text-xs text-gray-500">
-                {lastRefillTime.toLocaleTimeString('tr-TR', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: false 
+                {lastRefillTime.toLocaleTimeString("tr-TR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
                 })}
               </div>
             </div>
@@ -108,13 +128,15 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
               <span className="text-sm">Son PLC Güncellemesi</span>
             </div>
             <div className="text-right">
-              <div className="text-sm text-teal-600 dark:text-teal-400">Canlı</div>
+              <div className="text-sm text-teal-600 dark:text-teal-400">
+                Canlı
+              </div>
               <div className="text-xs text-gray-500">
-                {lastUpdateTime.toLocaleTimeString('tr-TR', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false 
+                {lastUpdateTime.toLocaleTimeString("tr-TR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
                 })}
               </div>
             </div>
@@ -123,7 +145,9 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
 
         {/* Warning Thresholds */}
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
-          <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">Alarm Eşikleri</div>
+          <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+            Alarm Eşikleri
+          </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">Uyarı Seviyesi</span>
