@@ -93,7 +93,7 @@ export function SiloDetailsCard({ siloData }: SiloDetailsCardProps) {
               <span className="text-sm">Kapasite</span>
             </div>
             <div className="mt-2 text-2xl text-gray-900 dark:text-white">
-              450
+              650
             </div>
             <div className="text-sm text-gray-500">kg toplam</div>
           </div>

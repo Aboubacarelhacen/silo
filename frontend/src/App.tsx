@@ -36,6 +36,8 @@ function AppContent() {
     showCriticalWarning,
     startRefilling,
     isRefilling,
+    dismissWarning,
+    dismissCriticalWarning,
   } = useSiloData();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
@@ -70,6 +72,8 @@ function AppContent() {
             showRefillWarning={showRefillWarning}
             showCriticalWarning={showCriticalWarning}
             onStartRefilling={startRefilling}
+            onDismissWarning={dismissWarning}
+            onDismissCriticalWarning={dismissCriticalWarning}
             isRefilling={isRefilling}
           />
         );
@@ -90,6 +94,8 @@ function AppContent() {
             showRefillWarning={showRefillWarning}
             showCriticalWarning={showCriticalWarning}
             onStartRefilling={startRefilling}
+            onDismissWarning={dismissWarning}
+            onDismissCriticalWarning={dismissCriticalWarning}
             isRefilling={isRefilling}
           />
         );

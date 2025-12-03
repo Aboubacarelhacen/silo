@@ -12,12 +12,14 @@ import { Button } from "../ui/button";
 interface CriticalWarningDialogProps {
   open: boolean;
   onFill: () => void;
+  onDismiss?: () => void;
   currentLevel: number;
 }
 
 export function CriticalWarningDialog({
   open,
   onFill,
+  onDismiss,
   currentLevel,
 }: CriticalWarningDialogProps) {
   return (
@@ -85,11 +87,21 @@ export function CriticalWarningDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <AlertDialogFooter className="sm:justify-center">
+        <AlertDialogFooter className="sm:justify-center flex-col sm:flex-row gap-2">
+          {onDismiss && (
+            <Button
+              onClick={onDismiss}
+              size="lg"
+              variant="outline"
+              className="border-2 border-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Görmezden Gel
+            </Button>
+          )}
           <Button
             onClick={onFill}
             size="lg"
-            className="w-full bg-gradient-to-r from-red-600 via-red-500 to-orange-600 hover:from-red-700 hover:via-red-600 hover:to-orange-700 text-white font-black text-lg shadow-2xl shadow-red-500/50 animate-pulse border-4 border-white"
+            className="w-full sm:flex-1 bg-gradient-to-r from-red-600 via-red-500 to-orange-600 hover:from-red-700 hover:via-red-600 hover:to-orange-700 text-white font-black text-lg shadow-2xl shadow-red-500/50 animate-pulse border-4 border-white"
           >
             <Flame className="mr-2 h-6 w-6 animate-bounce" />
             ACİL DOLDUR - HEMEN!

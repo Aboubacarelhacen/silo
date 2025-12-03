@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import type { SiloLevelSample, AlarmEvent, SiloData, SiloStatus, ProductionData, ConnectionStatus } from '../types';
 
 const MAX_HISTORY_POINTS = 50;
-const SILO_CAPACITY_KG = 450;
+const SILO_CAPACITY_KG = 650;
 
 export function useSiloData() {
-  const [currentLevel, setCurrentLevel] = useState(100);
+  const [currentLevel, setCurrentLevel] = useState(74.3);
   const [history, setHistory] = useState<SiloLevelSample[]>([]);
   const [events, setEvents] = useState<AlarmEvent[]>([]);
   const [lastRefillTime, setLastRefillTime] = useState(new Date(Date.now() - 2 * 60 * 60 * 1000));
@@ -58,10 +58,11 @@ export function useSiloData() {
             addEvent('info', `✅ Silo başarıyla ${newLevel.toFixed(1)}% seviyesine dolduruldu`);
           }
         } else {
-          // Drain from 100% to 20% then to 0% (critical)
-          // From 100% to 40%: 5 minutes, From 40% to 20%: continue draining, below 20%: critical
+          // Drain from 74.3% to 40% in 25 minutes (1500 seconds)
+          // Then continue to 20% (critical)
           if (prev > 20) {
-            const decrease = 0.2; // Fixed rate
+            // 74.3% to 40% = 34.3% drop over 1500 seconds = 0.022867% per second
+            const decrease = 0.022867;
             newLevel = Math.max(20, prev - decrease);
             
             // Show warning when reaching 40%
@@ -144,6 +145,16 @@ export function useSiloData() {
     addEvent('info', `🔵 Silo doldurma işlemi başlatıldı...`);
   }, [addEvent]);
 
+  const dismissWarning = useCallback(() => {
+    setShowRefillWarning(false);
+    addEvent('info', `ℹ️ Doldurma uyarısı kullanıcı tarafından görmezden gelindi`);
+  }, [addEvent]);
+
+  const dismissCriticalWarning = useCallback(() => {
+    setShowCriticalWarning(false);
+    addEvent('warning', `⚠️ Kritik uyarı kullanıcı tarafından görmezden gelindi`);
+  }, [addEvent]);
+
   return {
     siloData,
     history,
@@ -155,5 +166,7 @@ export function useSiloData() {
     showCriticalWarning,
     startRefilling,
     isRefilling,
+    dismissWarning,
+    dismissCriticalWarning,
   };
 }

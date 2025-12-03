@@ -12,12 +12,14 @@ import { Button } from "../ui/button";
 interface RefillWarningDialogProps {
   open: boolean;
   onFill: () => void;
+  onDismiss?: () => void;
   currentLevel: number;
 }
 
 export function RefillWarningDialog({
   open,
   onFill,
+  onDismiss,
   currentLevel,
 }: RefillWarningDialogProps) {
   return (
@@ -69,7 +71,17 @@ export function RefillWarningDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <AlertDialogFooter className="sm:justify-center">
+        <AlertDialogFooter className="sm:justify-center gap-2">
+          {onDismiss && (
+            <Button
+              onClick={onDismiss}
+              size="lg"
+              variant="outline"
+              className="border-gray-300 dark:border-gray-700"
+            >
+              Görmezden Gel
+            </Button>
+          )}
           <Button
             onClick={onFill}
             size="lg"

@@ -33,6 +33,8 @@ interface DashboardPageProps {
   showRefillWarning?: boolean;
   showCriticalWarning?: boolean;
   onStartRefilling?: () => void;
+  onDismissWarning?: () => void;
+  onDismissCriticalWarning?: () => void;
   isRefilling?: boolean;
 }
 
@@ -45,6 +47,8 @@ export function DashboardPage({
   showRefillWarning = false,
   showCriticalWarning = false,
   onStartRefilling = () => {},
+  onDismissWarning,
+  onDismissCriticalWarning,
   isRefilling = false,
 }: DashboardPageProps) {
   const [currentTemperature, setCurrentTemperature] = useState<number | null>(
@@ -74,12 +78,14 @@ export function DashboardPage({
       <CriticalWarningDialog
         open={showCriticalWarning}
         onFill={onStartRefilling}
+        onDismiss={onDismissCriticalWarning}
         currentLevel={siloData.currentLevel}
       />
       {/* Refill Warning Dialog (40% - lower priority) */}
       <RefillWarningDialog
         open={showRefillWarning && !showCriticalWarning}
         onFill={onStartRefilling}
+        onDismiss={onDismissWarning}
         currentLevel={siloData.currentLevel}
       />
       {/* PLC Connection Control */}
