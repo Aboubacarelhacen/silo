@@ -32,6 +32,10 @@ function AppContent() {
     connectionStatus,
     productionData,
     acknowledgeEvent,
+    showRefillWarning,
+    showCriticalWarning,
+    startRefilling,
+    isRefilling,
   } = useSiloData();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
@@ -63,6 +67,10 @@ function AppContent() {
             events={events}
             productionData={productionData}
             onAcknowledgeEvent={acknowledgeEvent}
+            showRefillWarning={showRefillWarning}
+            showCriticalWarning={showCriticalWarning}
+            onStartRefilling={startRefilling}
+            isRefilling={isRefilling}
           />
         );
       case "realtime":
@@ -79,6 +87,10 @@ function AppContent() {
             events={events}
             productionData={productionData}
             onAcknowledgeEvent={acknowledgeEvent}
+            showRefillWarning={showRefillWarning}
+            showCriticalWarning={showCriticalWarning}
+            onStartRefilling={startRefilling}
+            isRefilling={isRefilling}
           />
         );
       case "alarms":

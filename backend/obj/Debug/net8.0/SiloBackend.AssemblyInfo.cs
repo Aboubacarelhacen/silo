@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SiloBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a705915593221b0e7c09eb167751222d703050fe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75a4188299fcc5cc358f07ad94878d2229c6606c")]
 [assembly: System.Reflection.AssemblyProductAttribute("SiloBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SiloBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

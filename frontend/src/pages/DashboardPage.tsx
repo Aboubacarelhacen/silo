@@ -7,6 +7,8 @@ import { EventLog } from "../components/silo/EventLog";
 import { ProductionStatusCard } from "../components/dashboard/ProductionStatusCard";
 import { AnimatedThermometer } from "../components/ui/animated-thermometer";
 import { PlcConnectionControl } from "../components/plc/PlcConnectionControl";
+import { RefillWarningDialog } from "../components/silo/RefillWarningDialog";
+import { CriticalWarningDialog } from "../components/silo/CriticalWarningDialog";
 import {
   Card,
   CardContent,
@@ -28,6 +30,10 @@ interface DashboardPageProps {
   events: AlarmEvent[];
   productionData: ProductionData;
   onAcknowledgeEvent: (eventId: string) => void;
+  showRefillWarning?: boolean;
+  showCriticalWarning?: boolean;
+  onStartRefilling?: () => void;
+  isRefilling?: boolean;
 }
 
 export function DashboardPage({
@@ -36,6 +42,10 @@ export function DashboardPage({
   events,
   productionData,
   onAcknowledgeEvent,
+  showRefillWarning = false,
+  showCriticalWarning = false,
+  onStartRefilling = () => {},
+  isRefilling = false,
 }: DashboardPageProps) {
   const [currentTemperature, setCurrentTemperature] = useState<number | null>(
     null
@@ -60,10 +70,20 @@ export function DashboardPage({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Critical Warning Dialog (20% - highest priority) */}
+      <CriticalWarningDialog
+        open={showCriticalWarning}
+        onFill={onStartRefilling}
+        currentLevel={siloData.currentLevel}
+      />
+      {/* Refill Warning Dialog (40% - lower priority) */}
+      <RefillWarningDialog
+        open={showRefillWarning && !showCriticalWarning}
+        onFill={onStartRefilling}
+        currentLevel={siloData.currentLevel}
+      />
       {/* PLC Connection Control */}
-      <PlcConnectionControl />
-
-      {/* Alarm Banner */}
+      <PlcConnectionControl /> {/* Alarm Banner */}
       <AlarmBanner
         status={siloData.status}
         level={siloData.currentLevel}
@@ -76,11 +96,14 @@ export function DashboardPage({
           }
         }}
       />
-
       {/* Top Row: Silo Gauge, Temperature, and Details */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-4">
         <div className="flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6">
-          <SiloGauge level={siloData.currentLevel} status={siloData.status} />
+          <SiloGauge
+            level={siloData.currentLevel}
+            status={siloData.status}
+            isRefilling={isRefilling}
+          />
         </div>
 
         <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
@@ -106,10 +129,8 @@ export function DashboardPage({
           </div>
         </div>
       </div>
-
       {/* Trend Chart */}
       <SiloTrendChart history={history} />
-
       {/* Event Log */}
       <EventLog events={events} onAcknowledge={onAcknowledgeEvent} />
     </div>
